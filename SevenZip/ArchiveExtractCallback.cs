@@ -227,17 +227,20 @@ namespace SevenZip
 
         private void IntEventArgsHandler(object sender, IntEventArgs e)
         {
-            var pold = (int)((_bytesWrittenOld * 100) / _bytesCount);
-            _bytesWritten += e.Value;
-            var pnow = (int)((_bytesWritten * 100) / _bytesCount);
-            if (pnow > pold)
+            if (_bytesCount > 0)
             {
-                if (pnow > 100)
+                var pold = (int)((_bytesWrittenOld * 100) / _bytesCount);
+                _bytesWritten += e.Value;
+                var pnow = (int)((_bytesWritten * 100) / _bytesCount);
+                if (pnow > pold)
                 {
-                    pold = pnow = 0;
+                    if (pnow > 100)
+                    {
+                        pold = pnow = 0;
+                    }
+                    _bytesWrittenOld = _bytesWritten;
+                    OnExtracting(new ProgressEventArgs((byte)pnow, (byte)(pnow - pold)));
                 }
-                _bytesWrittenOld = _bytesWritten;
-                OnExtracting(new ProgressEventArgs((byte)pnow, (byte)(pnow - pold)));
             }
         }
 
@@ -264,18 +267,18 @@ namespace SevenZip
         /// <param name="outStream">Output stream pointer</param>
         /// <param name="askExtractMode">Extraction mode</param>
         /// <returns>0 if OK</returns>
-        public int GetStream(uint index, out 
+        public int GetStream(uint index, out
 #if !MONO
-		                     ISequentialOutStream
+                             ISequentialOutStream
 #else
-		                     HandleRef
+                             HandleRef
 #endif
-		                     outStream, AskMode askExtractMode)
+                             outStream, AskMode askExtractMode)
         {
 #if !MONO
             outStream = null;
 #else
-			outStream = new System.Runtime.InteropServices.HandleRef(null, IntPtr.Zero);		
+            outStream = new System.Runtime.InteropServices.HandleRef(null, IntPtr.Zero);		
 #endif			
             if (Canceled)
             {
@@ -317,7 +320,7 @@ namespace SevenZip
 
                         #endregion
 
-                        fileName = Path.Combine(_directory, _directoryStructure? entryName : Path.GetFileName(entryName));
+                        fileName = Path.Combine(_directory, _directoryStructure ? entryName : Path.GetFileName(entryName));
                         _archive.GetProperty(index, ItemPropId.IsDirectory, ref data);
                         try
                         {
@@ -348,7 +351,7 @@ namespace SevenZip
 #if !MONO
                                     outStream = _fakeStream;
 #else
-									outStream = _fakeStream.Handle;								
+                                    outStream = _fakeStream.Handle;								
 #endif
                                     goto FileExtractionStartedLabel;
                                 }
@@ -422,7 +425,7 @@ namespace SevenZip
                     #endregion
                 }
 
-            FileExtractionStartedLabel:
+                FileExtractionStartedLabel:
                 _doneRate += 1.0f / _filesCount;
                 var iea = new FileInfoEventArgs(
                     _extractor.ArchiveFileData[(int)index], PercentDoneEventArgs.ProducePercentDone(_doneRate));
@@ -489,7 +492,7 @@ namespace SevenZip
                     GC.WaitForPendingFinalizers();
                 }
                 var iea = new FileInfoEventArgs(
-                    _extractor.ArchiveFileData[_currentIndex], PercentDoneEventArgs.ProducePercentDone(_doneRate));                
+                    _extractor.ArchiveFileData[_currentIndex], PercentDoneEventArgs.ProducePercentDone(_doneRate));
                 OnFileExtractionFinished(iea);
                 if (iea.Cancel)
                 {

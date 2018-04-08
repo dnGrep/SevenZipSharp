@@ -474,6 +474,7 @@ namespace SevenZip
             {"4D-53-43-46",								                        InArchiveFormat.Cab},
             {"49-54-53-46",								                        InArchiveFormat.Chm},
             {"21-3C-61-72-63-68-3E-0A-64-65-62-69-61-6E-2D-62-69-6E-61-72-79",	InArchiveFormat.Deb},
+            {"30-37-30-37-30-32-31-39-39-45-41-46-30-36-30-30",                 InArchiveFormat.Cpio},
             {"43-44-30-30-31",							                        InArchiveFormat.Iso},
             //^ 0x8001, 0x8801 or 0x9001 byte offset
             {"ED-AB-EE-DB",								                        InArchiveFormat.Rpm},

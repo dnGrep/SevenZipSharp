@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
@@ -30,7 +31,7 @@ namespace SevenZipTest
     class Program
     {
         static void Main(string[] args)
-        {          
+        {
             Console.WriteLine("SevenZipSharp test application.");
             //Console.ReadKey();
 
@@ -45,9 +46,47 @@ namespace SevenZipTest
                 Console.WriteLine(((uint)features).ToString("X6"));
             */
 
+            #region dnGrep Extraction test
+
+            List<string> extensions = new List<string>
+            {
+                ".zip",".rar",".7z",".gz",".gzip",".bz2",".bzip2",".tar",".tbz2",".tbz",".tgz",".arj",".cab",".cpio",".deb",".dmg",".iso",".hfs",".hfsx",".lzh",".lha",".lzma",".z",".taz",".rpm",".xar",".pkg",".xz",".txz",".zipx",".jar",".epub",".wim",".chm"
+            };
+
+            foreach (string file in Directory.EnumerateFiles(@"C:\Users\Doug\Source\Repos\TestArchives", "*.*", SearchOption.AllDirectories)
+                .Where(f => extensions.Contains(Path.GetExtension(f))))
+            {
+                Console.WriteLine($"Opening {file}");
+
+                using (FileStream input = File.OpenRead(file))
+                {
+                    try
+                    {
+                        using (SevenZipExtractor extractor = new SevenZipExtractor(input))
+                        {
+                            foreach (var fileInfo in extractor.ArchiveFileData)
+                            {
+                                var attr = (FileAttributes)fileInfo.Attributes;
+                                string innerFileName = fileInfo.FileName;
+
+                                Console.WriteLine(innerFileName);
+                            }
+                        }
+                    }
+                    catch(Exception ex)
+                    {
+                        string st = ex.StackTrace;
+
+                        Console.WriteLine($"Error extracting from {file}: " + ex.Message);
+                    }
+                }
+            }
+
+            #endregion
+
             #region Temporary test
-            var features = SevenZip.SevenZipExtractor.CurrentLibraryFeatures;
-            Console.WriteLine(((uint)features).ToString("X6"));
+            //var features = SevenZip.SevenZipExtractor.CurrentLibraryFeatures;
+            //Console.WriteLine(((uint)features).ToString("X6"));
             #endregion
 
             #region Extraction test - ExtractFiles
@@ -81,7 +120,7 @@ namespace SevenZipTest
             tmp.CompressDirectory(@"d:\Temp\!Пусто", @"d:\Temp\test.7z");
             //*/
             #endregion
-            
+
             #region Compression test - features Append mode
             /*var tmp = new SevenZipCompressor();
             tmp.CompressionMode = CompressionMode.Append;            
@@ -104,7 +143,7 @@ namespace SevenZipTest
             tmp.CompressDirectory(@"D:\Temp\!Пусто", @"D:\Temp\arch.7z");            
             //*/
             #endregion
-            
+
             #region Extraction test. Shows cancel feature.
             /*using (var tmp = new SevenZipExtractor(@"D:\Temp\test.7z"))
             {
@@ -157,10 +196,10 @@ namespace SevenZipTest
                 Console.WriteLine("Number of files: " + ea.Value.ToString()); 
             };
             //*/
-            /*
-            tmp.CompressFiles(
-                @"d:\Temp\test.bz2", @"c:\log.txt", @"d:\Temp\08022009.jpg");*/
-            //tmp.CompressDirectory(@"d:\Temp\!Пусто", @"d:\Temp\arch.7z");
+                    /*
+                    tmp.CompressFiles(
+                        @"d:\Temp\test.bz2", @"c:\log.txt", @"d:\Temp\08022009.jpg");*/
+                    //tmp.CompressDirectory(@"d:\Temp\!Пусто", @"d:\Temp\arch.7z");
             #endregion
 
             #region Multi-threaded extraction test
@@ -293,7 +332,7 @@ namespace SevenZipTest
                 tmp.ExtractFile(4, @"D:\Temp\!Пусто");
             }
             //*/
-            #endregion            
+            #endregion
 
             #region CompressFiles Zip test
             /*var tmp = new SevenZipCompressor();
@@ -431,5 +470,5 @@ namespace SevenZipTest
             Console.WriteLine("Press any key to finish.");
             Console.ReadKey();
         }
-    }    
+    }
 }

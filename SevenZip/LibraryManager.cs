@@ -57,7 +57,7 @@ namespace SevenZip
         /// 7z.dll (from the 7-zip distribution) supports every InArchiveFormat for encoding and decoding.
         /// </remarks>
         private static string _libraryFileName = ConfigurationManager.AppSettings["7zLocation"] ??
-            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "7z.dll");
+            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "7z64.dll");
 #endif
 #if WINCE 		
         private static string _libraryFileName =
@@ -365,7 +365,7 @@ namespace SevenZip
             sp.Demand();
 #endif
             lock (_syncRoot)
-			{
+            {
                 if (_modulePtr != IntPtr.Zero)
             {
                 if (format is InArchiveFormat)
@@ -428,7 +428,7 @@ namespace SevenZip
                     }
                 }
             }
-			}
+            }
         }
 
         /// <summary>
@@ -476,9 +476,9 @@ namespace SevenZip
 #if !WINCE && !MONO
                         createObject(ref classID, ref interfaceId, out result);
 #elif !MONO
-                    	NativeMethods.CreateCOMObject(ref classID, ref interfaceId, out result);
+                        NativeMethods.CreateCOMObject(ref classID, ref interfaceId, out result);
 #else
-						result = SevenZip.Mono.Factory.CreateInterface<IInArchive>(user, classID, interfaceId);
+                        result = SevenZip.Mono.Factory.CreateInterface<IInArchive>(user, classID, interfaceId);
 #endif
                     }
                     catch (Exception)
@@ -535,9 +535,9 @@ namespace SevenZip
 #if !WINCE && !MONO
                         createObject(ref classID, ref interfaceId, out result);
 #elif !MONO
-                    	NativeMethods.CreateCOMObject(ref classID, ref interfaceId, out result);
+                        NativeMethods.CreateCOMObject(ref classID, ref interfaceId, out result);
 #else
-						result = SevenZip.Mono.Factory.CreateInterface<IOutArchive>(classID, interfaceId, user);
+                        result = SevenZip.Mono.Factory.CreateInterface<IOutArchive>(classID, interfaceId, user);
 #endif
                     }
                     catch (Exception)

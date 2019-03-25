@@ -21,21 +21,21 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Security.Permissions;
 #if !WINCE
-using FILETIME=System.Runtime.InteropServices.ComTypes.FILETIME;
+using FILETIME = System.Runtime.InteropServices.ComTypes.FILETIME;
 #elif WINCE
 using FILETIME=OpenNETCF.Runtime.InteropServices.ComTypes.FILETIME;
 #endif
 
 namespace SevenZip
 {
-    #if UNMANAGED
+#if UNMANAGED
 
     /// <summary>
     /// The structure to fix x64 and x32 variant size mismatch.
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
     internal struct PropArray
-    {        
+    {
         uint _cElems;
         IntPtr _pElems;
     }
@@ -98,12 +98,12 @@ namespace SevenZip
         {
             private get
             {
-                return (VarEnum) _vt;
+                return (VarEnum)_vt;
             }
 
             set
             {
-                _vt = (ushort) value;
+                _vt = (ushort)value;
             }
         }
 
@@ -339,7 +339,7 @@ namespace SevenZip
         /// <returns>true if the specified System.Object is equal to the current PropVariant; otherwise, false.</returns>
         public override bool Equals(object obj)
         {
-            return (obj is PropVariant) ? Equals((PropVariant) obj) : false;
+            return (obj is PropVariant) ? Equals((PropVariant)obj) : false;
         }
 
         /// <summary>
@@ -434,17 +434,17 @@ namespace SevenZip
         /// </summary>
         UnsupportedMethod,
         /// <summary>
-        /// Data error has occured
+        /// Data error has occurred
         /// </summary>
         DataError,
         /// <summary>
-        /// CrcError has occured
+        /// CrcError has occurred
         /// </summary>
         CrcError
     }
 
     /// <summary>
-    /// Codes of item properities
+    /// Codes of item properties
     /// </summary>
     internal enum ItemPropId : uint
     {
@@ -453,9 +453,13 @@ namespace SevenZip
         /// </summary>
         NoProperty = 0,
         /// <summary>
+        /// 
+        /// </summary>
+        MainSubfile,
+        /// <summary>
         /// Handler item index
         /// </summary>
-        HandlerItemIndex = 2,
+        HandlerItemIndex,
         /// <summary>
         /// Item path
         /// </summary>
@@ -477,7 +481,7 @@ namespace SevenZip
         /// </summary>
         Size,
         /// <summary>
-        /// Item packed sise; usually absent
+        /// Item packed size; usually absent
         /// </summary>
         PackedSize,
         /// <summary>
@@ -553,7 +557,7 @@ namespace SevenZip
         /// </summary>
         Group,
         /// <summary>
-        /// Bloack size(?)
+        /// Block size(?)
         /// </summary>
         Block,
         /// <summary>
@@ -632,10 +636,21 @@ namespace SevenZip
         /// Archive checksum
         /// </summary>
         Checksum,
+
+        Characts,
+        Va,
+        Id,
+        ShortName,
+        CreatorApp,
+        SectorSize,
+        PosixAttrib,
+        SymLink,
+        Error,
+
         /// <summary>
         /// (?)
         /// </summary>
-        TotalSize = 0x1100,
+        TotalSize,
         /// <summary>
         /// (?)
         /// </summary>
@@ -651,15 +666,61 @@ namespace SevenZip
         /// <summary>
         /// Local item name(?); usually absent
         /// </summary>
-        LocalName = 0x1200,
+        LocalName,
         /// <summary>
         /// (?)
         /// </summary>
         Provider,
+
+        NtSecure,
+        IsAltStream,
+        IsAux,
+        IsDeleted,
+        IsTree,
+        Sha1,
+        Sha256,
+        ErrorType,
+        NumErrors,
+        ErrorFlags,
+        WarningFlags,
+        Warning,
+        NumStreams,
+        NumAltStreams,
+        AltStreamsSize,
+        VirtualSize,
+        UnpackSize,
+        TotalPhySize,
+        VolumeIndex,
+        SubType,
+        ShortComment,
+        CodePage,
+        IsNotArcType,
+        PhySizeCantBeDetected,
+        ZerosTailIsAllowed,
+        TailSize,
+        EmbeddedStubSize,
+        NtReparse,
+        HardLink,
+        INode,
+        StreamId,
+        ReadOnly,
+        OutName,
+        CopyLink,
+        NUM_DEFINED,
+
         /// <summary>
-        /// User defined property; usually absent
+        /// User defined properties follow
         /// </summary>
-        UserDefined = 0x10000
+        UserDefined = 0x10000,
+        UserDefinded1,
+        UserDefinded2,
+        UserDefinded3,
+        UserDefinded4,
+        UserDefinded5,
+        UserDefinded6,
+        UserDefinded7,
+        UserDefinded8,
+        UserDefinded9,
     }
 
     /*/// <summary>
@@ -688,7 +749,7 @@ namespace SevenZip
         /// </summary>
         public static readonly Dictionary<ItemPropId, string> PropIdNames =
         #region Initialization
-            new Dictionary<ItemPropId, string>(46)
+            new Dictionary<ItemPropId, string>(110)
             {
                 {ItemPropId.Path, "Path"},
                 {ItemPropId.Name, "Name"},
@@ -704,10 +765,7 @@ namespace SevenZip
                 {ItemPropId.Encrypted, "Encrypted"},
                 {ItemPropId.SplitBefore, "Split Before"},
                 {ItemPropId.SplitAfter, "Split After"},
-                {
-                    ItemPropId.DictionarySize,
-                    "Dictionary Size"
-                    },
+                {ItemPropId.DictionarySize, "Dictionary Size" },
                 {ItemPropId.Crc, "CRC"},
                 {ItemPropId.Type, "Type"},
                 {ItemPropId.IsAnti, "Anti"},
@@ -720,43 +778,34 @@ namespace SevenZip
                 {ItemPropId.Comment, "Comment"},
                 {ItemPropId.Position, "Position"},
                 {ItemPropId.Prefix, "Prefix"},
-                {
-                    ItemPropId.NumSubDirs,
-                    "Number of subdirectories"
-                    },
-                {
-                    ItemPropId.NumSubFiles,
-                    "Number of subfiles"
-                    },
-                {
-                    ItemPropId.UnpackVersion,
-                    "Unpacker version"
-                    },
+                {ItemPropId.NumSubDirs, "Number of subdirectories" },
+                {ItemPropId.NumSubFiles, "Number of subfiles" },
+                {ItemPropId.UnpackVersion, "Unpacker version" },
                 {ItemPropId.Volume, "Volume"},
                 {ItemPropId.IsVolume, "IsVolume"},
                 {ItemPropId.Offset, "Offset"},
                 {ItemPropId.Links, "Links"},
-                {
-                    ItemPropId.NumBlocks,
-                    "Number of blocks"
-                    },
-                {
-                    ItemPropId.NumVolumes,
-                    "Number of volumes"
-                    },
+                {ItemPropId.NumBlocks, "Number of blocks" },
+                {ItemPropId.NumVolumes, "Number of volumes" },
                 {ItemPropId.TimeType, "Time type"},
                 {ItemPropId.Bit64, "64-bit"},
                 {ItemPropId.BigEndian, "Big endian"},
                 {ItemPropId.Cpu, "CPU"},
-                {
-                    ItemPropId.PhysicalSize,
-                    "Physical Size"
-                    },
+                {ItemPropId.PhysicalSize, "Physical Size" },
                 {ItemPropId.HeadersSize, "Headers Size"},
                 {ItemPropId.Checksum, "Checksum"},
                 {ItemPropId.FreeSpace, "Free Space"},
-                {ItemPropId.ClusterSize, "Cluster Size"}
+                {ItemPropId.ClusterSize, "Cluster Size"},
             };
+
+        static PropIdToName()
+        {
+            foreach (ItemPropId item in Enum.GetValues(typeof(ItemPropId)))
+            {
+                if (!PropIdNames.ContainsKey(item))
+                    PropIdNames.Add(item, Enum.GetName(typeof(ItemPropId), item));
+            }
+        }
         #endregion
     }
 
@@ -968,7 +1017,7 @@ namespace SevenZip
         int GetStream(
             [MarshalAs(UnmanagedType.LPWStr)] string name,
             [Out, MarshalAs(UnmanagedType.Interface)] out IInStream inStream);
-    }    
+    }
 
     /// <summary>
     /// 7-zip ISequentialInStream imported interface
@@ -1092,9 +1141,9 @@ namespace SevenZip
     /// <summary>
     /// 7-zip essential in archive interface
     /// </summary>
-    [ComImport]  
-	[Guid("23170F69-40C1-278A-0000-000600600000")]
-    [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]	
+    [ComImport]
+    [Guid("23170F69-40C1-278A-0000-000600600000")]
+    [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     internal interface IInArchive
     {
         /// <summary>

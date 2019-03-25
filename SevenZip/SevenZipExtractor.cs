@@ -130,7 +130,7 @@ namespace SevenZip
             try
             {
                 _inStream = new ArchiveEmulationStreamProxy(stream, _offset);
-				_packedSize = stream.Length;
+                _packedSize = stream.Length;
                 _archive = SevenZipLibraryManager.InArchive(_format, this);
             }
             catch (SevenZipLibraryException)
@@ -546,10 +546,7 @@ namespace SevenZip
                             var archProps = new List<ArchiveProperty>((int)numProps);
                             for (uint i = 0; i < numProps; i++)
                             {
-                                string propName;
-                                ItemPropId propId;
-                                ushort varType;
-                                _archive.GetArchivePropertyInfo(i, out propName, out propId, out varType);
+                                _archive.GetArchivePropertyInfo(i, out string propName, out ItemPropId propId, out ushort varType);
                                 _archive.GetArchiveProperty(propId, ref data);
                                 if (propId == ItemPropId.Solid)
                                 {
@@ -724,10 +721,10 @@ namespace SevenZip
         /// <param name="stream">The stream to check.</param>
         private static void ValidateStream(Stream stream)
         {
-			if (stream == null)
-			{
-				throw new ArgumentNullException("stream");
-			}
+            if (stream == null)
+            {
+                throw new ArgumentNullException("stream");
+            }
             if (!stream.CanSeek || !stream.CanRead)
             {
                 throw new ArgumentException("The specified stream can not seek or read.", "stream");
@@ -760,13 +757,13 @@ namespace SevenZip
             _archiveProperties = null;
             _archiveFileInfoCollection = null;
             
-	    if (_inStream != null)
-	    {
+        if (_inStream != null)
+        {
                 _inStream.Dispose();
                 _inStream = null;
-	    }
+        }
             
-	    if (_openCallback != null)
+        if (_openCallback != null)
             {
                 try
                 {
